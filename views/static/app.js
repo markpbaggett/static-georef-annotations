@@ -1,8 +1,7 @@
-var pid = 'galston%3A700';
 var queryString = window.location.search;
 var urlParams = new URLSearchParams(queryString);
+var baseUrl = urlParams.get('baseUrl') + '/info.json';
 
-var baseUrl = 'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1/info.json';
 
 var map = L.map('map', {
     center: [0, 0],

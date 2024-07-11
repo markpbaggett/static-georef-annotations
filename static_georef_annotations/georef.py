@@ -1,14 +1,27 @@
-from bottle import Bottle, template, static_file
+from bottle import Bottle, template, static_file, request
+#from static_georef_annotations import AnnotatedCanvas
 
 app = Bottle()
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return template('index')
+    if request.method == "GET":
+        canvas = request.query.get(
+            'iiif-image',
+            'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+        )
+        return template('index', data=canvas)
+    elif request.method == "POST":
+        canvas = request.forms.get('iiif-image')
+        return template('index', data=canvas)
 
 @app.route('/cropper')
 def cropper():
-    return template('static/cropper')
+    canvas = request.query.get(
+        'baseUrl',
+        'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+    )
+    return template('static/cropper', data=canvas)
 
 @app.route('/map')
 def cropper():

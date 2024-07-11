@@ -6,7 +6,7 @@
     </div>
     <dialog id="my_modal_1" class="modal">
       <div class="modal-box" style="max-width: 800px;">
-        <iframe src="/cropper" width="750" height="500"></iframe>
+        <iframe src="/cropper?baseUrl={{data}}" width="750" height="500"></iframe>
         <div class="modal-action">
           <form method="dialog">
             <button class="btn btn-secondary">Close</button>

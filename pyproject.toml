@@ -10,6 +10,7 @@ python = "^3.12"
 bottle = "^0.12.25"
 iiif-prezi3 = "^1.2.1"
 httpx = "^0.27.0"
+bottle-session = "^1.0"
 
 
 [build-system]

@@ -1,19 +1,28 @@
 from bottle import Bottle, template, static_file, request
-#from static_georef_annotations import AnnotatedCanvas
+from canvas import AnnotatedCanvas
+import bottle_session
 
 app = Bottle()
+plugin = bottle_session.SessionPlugin(cookie_lifetime=6000)
+app.install(plugin)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', method='GET')
 def index():
-    if request.method == "GET":
-        canvas = request.query.get(
-            'iiif-image',
-            'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
-        )
-        return template('index', data=canvas)
-    elif request.method == "POST":
-        canvas = request.forms.get('iiif-image')
-        return template('index', data=canvas)
+    canvas = request.query.get(
+        'iiif-image',
+        'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+    )
+    return template('index', data=canvas)
+
+@app.route('/', method='POST')
+def submit():
+    field_data = request.forms.get('annotation_url')
+    print(field_data)
+    canvas = request.query.get(
+        'iiif-image',
+        'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+    )
+    return template('index', data=canvas)
 
 @app.route('/cropper')
 def cropper():

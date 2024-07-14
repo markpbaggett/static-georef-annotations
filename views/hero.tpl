@@ -9,6 +9,10 @@
         Create georeferencing annotations that can be hosted <em>statically</em> on the web
       </p>
       <button class="btn btn-primary">Get Started</button>
+      <button class="btn btn-secondary" onclick="window.location.href='/';">Add</button>
+      <button class="btn btn-secondary" onclick="window.location.href='/generate';">Generate</button>
+      <button class="btn btn-accent">Manage</button>
+      <button class="btn btn-accent">Clear</button>
     </div>
   </div>
 </div>

@@ -58,15 +58,28 @@ def submit():
 
 @app.route('/generate', method='GET')
 def generate():
+    if 'annotations' not in request.session:
+        request.session['annotations'] = []
+    if 'canvas' not in request.session:
+        canvas = request.query.get(
+            'iiif-image',
+            'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+        )
+        request.session['canvas'] = canvas
     annotated_canvas = AnnotatedCanvas(
         request.session['canvas'],
         annotations=request.session['annotations'],
     )
     annotated_canvas_without_features = annotated_canvas.build()
-    annotated_canvas_without_features['annotations'][0]['items'][0]['body']['features'] = request.session['annotations']
-    with open('examples/check.json', 'w') as outfile:
-        json.dump(annotated_canvas_without_features, outfile)
-    return template('index', data=request.session['canvas'])
+    if 'annotations' in annotated_canvas_without_features:
+        annotated_canvas_without_features['annotations'][0]['items'][0]['body']['features'] = request.session['annotations']
+    return template(
+        'generate',
+        data=json.dumps(
+            annotated_canvas_without_features,
+            indent=4
+        )
+    )
 
 @app.route('/cropper')
 def cropper():

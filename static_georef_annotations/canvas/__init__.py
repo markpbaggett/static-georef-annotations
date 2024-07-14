@@ -1,1 +1,1 @@
-from .canvas import AnnotatedCanvas
+from .canvas import AnnotatedCanvas as AnnotatedCanvas

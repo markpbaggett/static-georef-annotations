@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="halloween">
+<html data-theme="synthwave">
 <head>
     <title>Map Coordinates Finder</title>
     <meta charset="utf-8" />

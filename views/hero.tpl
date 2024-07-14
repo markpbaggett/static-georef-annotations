@@ -6,7 +6,7 @@
     <div class="max-w-md">
       <h1 class="mb-5 text-4xl font-bold">Static Georeferencing Annotations</h1>
       <p class="mb-5">
-        Create georeferencing annotations and host them in GitHub statically.
+        Create georeferencing annotations that can be hosted <em>statically</em> on the web
       </p>
       <button class="btn btn-primary">Get Started</button>
     </div>

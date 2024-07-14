@@ -5,9 +5,7 @@ class Feature:
 
     def __add_properties(self):
         return {
-            "resourceCoords": [
-                    [int(point) for point in self.data['image_points'].split(',')]
-            ]
+            "resourceCoords": [int(point) for point in self.data['image_points'].split(',')]
         }
 
     def __add_geometry(self):

@@ -1,6 +1,8 @@
 from bottle import Bottle, template, static_file, request
 from beaker.middleware import SessionMiddleware
 from feature import Feature
+from canvas import AnnotatedCanvas
+import json
 
 session_opts = {
     'session.type': 'file',
@@ -17,12 +19,14 @@ def setup_request():
 
 @app.route('/', method='GET')
 def index():
-    if 'annotations' not in request.session:
-        request.session['annotations'] = []
     canvas = request.query.get(
         'iiif-image',
         'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
     )
+    if 'annotations' not in request.session:
+        request.session['annotations'] = []
+        request.session['canvas'] = canvas
+    request.session.save()
     print(request.session['annotations'])
     return template('index', data=canvas)
 
@@ -30,6 +34,12 @@ def index():
 def submit():
     if 'annotations' not in request.session:
         request.session['annotations'] = []
+    if 'canvas' not in request.session:
+        canvas = request.query.get(
+            'iiif-image',
+            'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+        )
+        request.session['canvas'] = canvas
     form_data = {
         "iiif_map_image": request.forms.get('iiif_map_image'),
         "canvas_url": request.forms.get('canvas_url'),
@@ -43,12 +53,20 @@ def submit():
     }
     request.session['annotations'].append(Feature(form_data).build())
     request.session.save()
-    canvas = request.query.get(
-        'iiif-image',
-        'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
-    )
     print(request.session['annotations'])
-    return template('index', data=canvas)
+    return template('index', data=request.session['canvas'])
+
+@app.route('/generate', method='GET')
+def generate():
+    annotated_canvas = AnnotatedCanvas(
+        request.session['canvas'],
+        annotations=request.session['annotations'],
+    )
+    annotated_canvas_without_features = annotated_canvas.build()
+    annotated_canvas_without_features['annotations'][0]['items'][0]['body']['features'] = request.session['annotations']
+    with open('examples/check.json', 'w') as outfile:
+        json.dump(annotated_canvas_without_features, outfile)
+    return template('index', data=request.session['canvas'])
 
 @app.route('/cropper')
 def cropper():

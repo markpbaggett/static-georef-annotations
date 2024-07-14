@@ -3,10 +3,6 @@
 Proof of Concept application for creating georeferencing annotations so that they can be displayed in
 [nakamura196's iiif_geo](https://github.com/nakamura196/iiif_geo).
 
-## Installing
-
-```pipx install static_georef_annotations```
-
 ## Using
 
 Create annotations, click `Generate`, store online (GitHub Pages integration in progress)
@@ -15,7 +11,7 @@ Create annotations, click `Generate`, store online (GitHub Pages integration in 
 
 Then, view your annotations in [iiif-geo](https://github.com/nakamura196/iiif_geo).
 
-![Example Map](./example_map.png)]
+![Example Map](./example_map.png)
 
 ## To do:
 

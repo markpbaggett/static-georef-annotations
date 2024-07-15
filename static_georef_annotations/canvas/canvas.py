@@ -10,7 +10,9 @@ class AnnotatedCanvas:
         self.client = httpx.Client(follow_redirects=True)
         self.image_details = self.__get_image_response(iiif_image)
         self.canvas_id = kwargs.get('canvas_id', 'https://example.org/georeferencing-example/canvas/p1')
+        print(self.canvas_id)
         self.canvas_label = self.__get_canvas_label(kwargs.get('canvas_label', 'Example Georeferencing Annotation List'))
+        print(self.canvas_label)
         self.extensions = self.__build_extensions()
 
     @staticmethod
@@ -96,5 +98,9 @@ class AnnotatedCanvas:
 
 
 if __name__ == "__main__":
-    x = AnnotatedCanvas('https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1')
+    x = AnnotatedCanvas(
+        iiif_image='https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1',
+        canvas_id='https://example.org/georeferencing-example/canvas/p2',
+        canvas_label='Mark'
+    )
     x.write_to_file('examples/test.json')

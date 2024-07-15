@@ -26,8 +26,9 @@ def index():
     if 'annotations' not in request.session:
         request.session['annotations'] = []
         request.session['canvas'] = canvas
+        request.session['canvas_label'] = ''
+        request.session['canvas_id'] = ''
     request.session.save()
-    print(request.session['annotations'])
     return template('index', data=canvas)
 
 @app.route('/', method='POST')
@@ -35,13 +36,12 @@ def submit():
     if 'annotations' not in request.session:
         request.session['annotations'] = []
     if 'canvas' not in request.session:
-        canvas = request.query.get(
-            'iiif-image',
-            'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
-        )
-        request.session['canvas'] = canvas
+        request.session['canvas'] = request.forms.get('iiif_map_image')
+    request.session['canvas_label'] = request.forms.get('canvas_label')
+    request.session['canvas_id'] = request.forms.get('canvas_url')
     form_data = {
         "iiif_map_image": request.forms.get('iiif_map_image'),
+        "canvas_label": request.forms.get('canvas_label'),
         "canvas_url": request.forms.get('canvas_url'),
         "image_points": request.forms.get('image_points'),
         "image_region": request.forms.get('image_region'),
@@ -53,7 +53,6 @@ def submit():
     }
     request.session['annotations'].append(Feature(form_data).build())
     request.session.save()
-    print(request.session['annotations'])
     return template('index', data=request.session['canvas'])
 
 @app.route('/generate', method='GET')
@@ -66,9 +65,15 @@ def generate():
             'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
         )
         request.session['canvas'] = canvas
+    if 'canvas_id' not in request.session:
+        request.session['canvas_id'] = ''
+    if 'canvas_label' not in request.session:
+        request.session['canvas_label'] = ''
     annotated_canvas = AnnotatedCanvas(
         request.session['canvas'],
         annotations=request.session['annotations'],
+        canvas_label=request.session['canvas_label'],
+        canvas_id=request.session['canvas_id'],
     )
     annotated_canvas_without_features = annotated_canvas.build()
     if 'annotations' in annotated_canvas_without_features:

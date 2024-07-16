@@ -8,7 +8,11 @@ session_opts = {
     'session.type': 'file',
     'session.data_dir': './.cache',
     'session.auto': True,
-    'session.cookie_expires': 600
+    'session.cookie_expires': 6000,
+    'session.annotations': [],
+    'session.canvas': 'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1',
+    'session.canvas_label': '',
+    'session.canvas_id': ''
 }
 
 app = Bottle()
@@ -21,15 +25,11 @@ def setup_request():
 def index():
     canvas = request.query.get(
         'iiif-image',
-        'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+        session_opts.get('session.canvas')
     )
-    if 'annotations' not in request.session:
-        request.session['annotations'] = []
-        request.session['canvas'] = canvas
-        request.session['canvas_label'] = ''
-        request.session['canvas_id'] = ''
+    request.session['canvas'] = canvas
     request.session.save()
-    return template('index', data=canvas)
+    return template('index', data=canvas, canvas=request.session['canvas'])
 
 @app.route('/', method='POST')
 def submit():
@@ -53,38 +53,38 @@ def submit():
     }
     request.session['annotations'].append(Feature(form_data).build())
     request.session.save()
-    return template('index', data=request.session['canvas'])
+    return template('index', data=request.session['canvas'], canvas=request.session['canvas'])
 
 @app.route('/generate', method='GET')
 def generate():
-    if 'annotations' not in request.session:
-        request.session['annotations'] = []
-    if 'canvas' not in request.session:
-        canvas = request.query.get(
-            'iiif-image',
-            'https://api.library.tamu.edu/iiif/2/f10c7823-4e52-334d-829a-239b69b9f81d;1'
+    for key, value in request.session.items():
+        # Debugging help to figure out what's in the session
+        print(f"{key}: {value}")
+    if len(session_opts['session.annotations']) == 0:
+        annotated_canvas = AnnotatedCanvas(
+            request.session['canvas'],
+            annotations=request.session['annotations'],
+            canvas_label=request.session['canvas_label'],
+            canvas_id=request.session['canvas_id'],
         )
-        request.session['canvas'] = canvas
-    if 'canvas_id' not in request.session:
-        request.session['canvas_id'] = ''
-    if 'canvas_label' not in request.session:
-        request.session['canvas_label'] = ''
-    annotated_canvas = AnnotatedCanvas(
-        request.session['canvas'],
-        annotations=request.session['annotations'],
-        canvas_label=request.session['canvas_label'],
-        canvas_id=request.session['canvas_id'],
-    )
-    annotated_canvas_without_features = annotated_canvas.build()
-    if 'annotations' in annotated_canvas_without_features:
-        annotated_canvas_without_features['annotations'][0]['items'][0]['body']['features'] = request.session['annotations']
-    return template(
-        'generate',
-        data=json.dumps(
-            annotated_canvas_without_features,
-            indent=4
+        annotated_canvas_without_features = annotated_canvas.build()
+        if 'annotations' in annotated_canvas_without_features:
+            annotated_canvas_without_features['annotations'][0]['items'][0]['body']['features'] = session_opts['session.annotations']
+        return template(
+            'generate',
+            data=json.dumps(
+                annotated_canvas_without_features,
+                indent=4
+            ),
+            canvas=request.session['canvas'],
         )
-    )
+    else:
+        return template(
+            'generate',
+            data='No annotations or session expired.',
+            canvas=request.session['canvas'],
+        )
+
 
 @app.route('/cropper')
 def cropper():

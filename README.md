@@ -1,6 +1,8 @@
 # Static Georeferencing Annotations
 
-Proof of Concept application for creating georeferencing annotations so that they can be displayed in
+**WORK IN PROGRESS**
+
+A proof of concept application for creating georeferencing annotations and storing them statically so that they can be displayed in
 [nakamura196's iiif_geo](https://github.com/nakamura196/iiif_geo).
 
 ## Using

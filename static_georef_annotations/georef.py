@@ -17,6 +17,13 @@ session_opts = {
 
 app = Bottle()
 
+def reset_session():
+    request.session.clear()
+    request.session['annotations'] = session_opts['session.annotations']
+    request.session['canvas'] = session_opts['session.canvas']
+    request.session['canvas_label'] = session_opts['session.canvas_label']
+    request.session['canvas_id'] = session_opts['session.canvas_id']
+
 @app.hook('before_request')
 def setup_request():
     request.session = request.environ['beaker.session']
@@ -60,7 +67,8 @@ def generate():
     for key, value in request.session.items():
         # Debugging help to figure out what's in the session
         print(f"{key}: {value}")
-    if len(session_opts['session.annotations']) == 0:
+    if len(request.session['annotations']) > 0:
+        print(f"{len(request.session['annotations'])} annotations found.")
         annotated_canvas = AnnotatedCanvas(
             request.session['canvas'],
             annotations=request.session['annotations'],
@@ -85,6 +93,15 @@ def generate():
             canvas=request.session['canvas'],
         )
 
+@app.route('/clear')
+def reset():
+    reset_session()
+    request.session.save()  # Ensure the session changes are saved
+    return template(
+        'generate',
+        data='The session has been cleared. You can create a new annotation list.\n\n  Remember to submit your initial canvas request with `?iiif-image={iiif_image}`.',
+        canvas=request.session['canvas'],
+    )
 
 @app.route('/cropper')
 def cropper():

@@ -12,7 +12,7 @@
       <button class="btn btn-secondary" onclick="window.location.href='/?iiif-image={{canvas}}';">Add</button>
       <button class="btn btn-secondary" onclick="window.location.href='/generate';">Generate</button>
       <button class="btn btn-accent">Manage</button>
-      <button class="btn btn-accent">Clear</button>
+      <button class="btn btn-accent" onclick="window.location.href='/clear';">Clear</button>
     </div>
   </div>
 </div>
